@@ -3,17 +3,23 @@ close all;
 
 %Initialization
 %fm input is a 3x2 matrix of the forces and moments e.g.:
-    Forces = [0; 10; 1];
-    Moments = [0; .015; .05];
+    Forces = [1; 10; 0];
+    Moments = [0; .9; 0];
     fm = [Forces,Moments];
-
+    
+    %Number of Steps
+    npts = 70;
+    
+    %Set Optical Axis Pointing Direction relative to body
+    opt_i = (.001*npts)*[1,1,0]';    
+    
 % dim and Inrt are inputs for Ihwd for a solid cuboid of height h, 
 %width w, depth d, mass m, (1x4 and 1x3) e.g.:
 
     h = 0.5;  %0.5m
     w = 0.5;  %0.5m
     d = 0.5;  %0.5m
-    m = 100.2;  %100.2kg
+    m = 10000.2;  %100.2kg
     dim = ([h,w,d,m]);
 
     Ih = 1/12*m*(w^2+d^2);
@@ -21,8 +27,6 @@ close all;
     Id = 1/12*m*(w^2+h^2);
     ihwd = ([Ih,Iw,Id]);
     
-    %Number of Steps
-    npts = 30;
     %Vector to store body rotations
     rot = [];
     
@@ -31,10 +35,7 @@ close all;
     pos = pos';
     
     anglexyz = cumtrapz(1:npts,omegaxyz);
-    
-    %Set Optical Axis Pointing Direction
-    opt_i = [1,1,0]';
-    
+       
 %Calculate rotation (rot) at each time interval
     for i = 1:npts
         phi = anglexyz(i,1);   %Roll
