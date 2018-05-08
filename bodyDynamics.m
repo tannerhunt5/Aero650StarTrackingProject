@@ -1,5 +1,5 @@
 
-function [omegax,omegay,omegaz,pos] = bodyDynamics(tarray,fm,dim,ihwd)
+function [omegaxyz,pos] = bodyDynamics(tarray,fm,dim,ihwd)
 % Written by Neil McHenry
 % AERO 650
 
@@ -53,9 +53,7 @@ function [omegax,omegay,omegaz,pos] = bodyDynamics(tarray,fm,dim,ihwd)
     
  %Part C: Output Xp and Yp over time (projection based on orientation/position)
 
- omegax = y(:,1);
- omegay = y(:,2);
- omegaz = y(:,3);
+ omegaxyz = y(:,1:3);
  pos = y(:,7:9);
 
   
