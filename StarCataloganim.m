@@ -9,23 +9,40 @@ close all;
 %Initialization 
     % Initial attitude: 
 %         rho = [1.27, 0.28, -2.7]';
-         rho = [0.1,0,0]';
+         rho = [0,0,0]';
 
         
-    % Attitude dynamics: pure spin about y-axis with w = 0.01 rad/s;
-        w = 0.01;
+    % Attitude dynamics: pure spin about z-axis with w = 0.01 rad/s;
+        w = 0.05;
     % Set Max simulation Time
-        maxTime = 2;
+        maxTime = 10;
         f = 1/10;
     % Select the visible stars falling in the star tracker FOV.
     % Add multiplicative Gaussian noise to observed stars: 3sigma = 20";
         gridSize = 200;
+        
+        %Initialize Surfaces and gauss plot histories
         gauss_surf = zeros(gridSize);
-%         gauss_hist = [];
+        dot_gauss1 = zeros(gridSize);
+        dot_gauss2 = zeros(gridSize);
+        dot_gauss3 = zeros(gridSize);
+        dot_gauss4 = zeros(gridSize);
+        dot_gauss5 = zeros(gridSize);
         pause_interval = 0;
+        %Sigma is the spread value of the gaussian function
         sigma = 3;
         q = [];
+        
+        %Integration time/Exposure Steps
+        Ig = 5;
+        
+        %Loop Count
         i=0;
+        %Loop Count past each division of 5 timesteps
+        i5 = i-5;
+        
+
+        d=zeros(2,2,2);
         
         %Observation Matrices
             Xhist = [];
@@ -92,6 +109,9 @@ close all;
         X(X == 0) = [];  
         %Combine row vectors of coordinates into a matrix
         Stars3D = [X;Y;Z];
+        
+        %Rotate whole catalog about Z axis
+        Stars3D = C*Stars3D;
         
    %% Part B: Plotting Starmap, Star Tracker View
        
@@ -173,11 +193,113 @@ close all;
             dot_gauss = exp(-1/(2*sigma^2) * (xgrid.^2 + ygrid.^2));
             lgaussx = length(dot_gauss) +Sx - 1;
             lgaussy = length(dot_gauss) +Sy - 1;
-
-
+            
+            %Save history of last 5 dot_gauss plots
+            if i == 1
+                dot_gauss1(Sx:lgaussx,Sy:lgaussy) = dot_gauss1(Sx:lgaussx,Sy:lgaussy) + dot_gauss;
+            end
+            if i == 2
+                dot_gauss2(Sx:lgaussx,Sy:lgaussy) = dot_gauss2(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;                
+            end
+            if i == 3
+                dot_gauss3(Sx:lgaussx,Sy:lgaussy) = dot_gauss3(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;                
+            end
+            if i == 4
+                dot_gauss4(Sx:lgaussx,Sy:lgaussy) = dot_gauss4(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;                
+            end
+            if i == 5
+                dot_gauss5(Sx:lgaussx,Sy:lgaussy) = dot_gauss5(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;                
+            end
+           
             gauss_surf(Sx:lgaussx,Sy:lgaussy) = gauss_surf(Sx:lgaussx,Sy:lgaussy) + dot_gauss;
-%             gauss_hist(i) = gauss_surf;
+
         end
+        
+      %If time is greater than 5, start removing old dot_gauss values
+            i5 = i5+ 1;
+      
+            if i5 == 1
+                %Subtract Old Plot
+                gauss_surf = gauss_surf -dot_gauss1;
+                %Reset dot_gauss with zeros
+                dot_gauss1 = zeros(200);
+                %Save New Plot
+                for count = 1:length(Xlin)
+                    Sx = (gridSize - round(1000*(Xlin(count)+0.1))) - gauss;
+                    Sy = (round(1000*(Ylin(count)+0.1))) - gauss;
+
+                    [xgrid,ygrid] = meshgrid (-gauss:gauss, -gauss:gauss);
+                    dot_gauss = exp(-1/(2*sigma^2) * (xgrid.^2 + ygrid.^2));
+                    lgaussx = length(dot_gauss) +Sx - 1;
+                    lgaussy = length(dot_gauss) +Sy - 1;                
+                    dot_gauss1(Sx:lgaussx,Sy:lgaussy) = dot_gauss1(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;
+                end
+
+            end
+
+            if i5 == 2
+                gauss_surf = gauss_surf - dot_gauss2;
+                dot_gauss2 = zeros(200);
+                for count = 1:length(Xlin)
+                    Sx = (gridSize - round(1000*(Xlin(count)+0.1))) - gauss;
+                    Sy = (round(1000*(Ylin(count)+0.1))) - gauss;
+
+                    [xgrid,ygrid] = meshgrid (-gauss:gauss, -gauss:gauss);
+                    dot_gauss = exp(-1/(2*sigma^2) * (xgrid.^2 + ygrid.^2));
+                    lgaussx = length(dot_gauss) +Sx - 1;
+                    lgaussy = length(dot_gauss) +Sy - 1;                
+                    dot_gauss2(Sx:lgaussx,Sy:lgaussy) = dot_gauss2(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;
+                end
+            end
+
+            if i5 == 3
+                gauss_surf = gauss_surf - dot_gauss3;
+                dot_gauss3 = zeros(200);
+                for count = 1:length(Xlin)
+                    Sx = (gridSize - round(1000*(Xlin(count)+0.1))) - gauss;
+                    Sy = (round(1000*(Ylin(count)+0.1))) - gauss;
+
+                    [xgrid,ygrid] = meshgrid (-gauss:gauss, -gauss:gauss);
+                    dot_gauss = exp(-1/(2*sigma^2) * (xgrid.^2 + ygrid.^2));
+                    lgaussx = length(dot_gauss) +Sx - 1;
+                    lgaussy = length(dot_gauss) +Sy - 1;                
+                    dot_gauss3(Sx:lgaussx,Sy:lgaussy) = dot_gauss3(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;
+                end
+            end
+
+            if i5 == 4
+                gauss_surf = gauss_surf - dot_gauss4;
+                dot_gauss4 = zeros(200);
+                for count = 1:length(Xlin)
+                    Sx = (gridSize - round(1000*(Xlin(count)+0.1))) - gauss;
+                    Sy = (round(1000*(Ylin(count)+0.1))) - gauss;
+
+                    [xgrid,ygrid] = meshgrid (-gauss:gauss, -gauss:gauss);
+                    dot_gauss = exp(-1/(2*sigma^2) * (xgrid.^2 + ygrid.^2));
+                    lgaussx = length(dot_gauss) +Sx - 1;
+                    lgaussy = length(dot_gauss) +Sy - 1;                
+                    dot_gauss4(Sx:lgaussx,Sy:lgaussy) = dot_gauss4(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;
+                end
+            end
+
+            if i5 == 5
+                gauss_surf = gauss_surf - dot_gauss5;
+                dot_gauss5 = zeros(200);
+                for count = 1:length(Xlin)
+                    Sx = (gridSize - round(1000*(Xlin(count)+0.1))) - gauss;
+                    Sy = (round(1000*(Ylin(count)+0.1))) - gauss;
+
+                    [xgrid,ygrid] = meshgrid (-gauss:gauss, -gauss:gauss);
+                    dot_gauss = exp(-1/(2*sigma^2) * (xgrid.^2 + ygrid.^2));
+                    lgaussx = length(dot_gauss) +Sx - 1;
+                    lgaussy = length(dot_gauss) +Sy - 1;                
+                    dot_gauss5(Sx:lgaussx,Sy:lgaussy) = dot_gauss5(Sx:lgaussx,Sy:lgaussy)+ dot_gauss;
+                end
+                %Reset Count
+                i5 = 0;
+            end                   
+        
+        
         surfplot = surf(gauss_surf);
         view([-90 90]);
         shading interp
